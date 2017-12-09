@@ -20,7 +20,7 @@ module.exports = EJS = (function () {
         },
         
         peekPath () {
-            return this.stack.length ? path.dirname(this.peek().path) : ("/");
+            return this.stack.length ? path.dirname(this.peek().path) : "/";
         },
         
         pop () {
@@ -34,6 +34,10 @@ module.exports = EJS = (function () {
                 var obj = this.copy(this.peek());
             this.stack.push(obj);
             return obj;
+        },
+        
+        clearStack () {
+            this.stack = [];
         },
         
         resolve (name) {
@@ -86,15 +90,27 @@ module.exports = EJS = (function () {
         },
         
         renderFunc (fn) {
-            var context = this.push();
-            fn(context.data);
-            return this.pop().html;
+            try {
+                var context = this.push();
+                fn(context.data);
+                return this.pop().html;
+            }
+            catch (err) {
+                this.clearStack();
+                throw err;
+            }
         },
         
         renderFile (name, data) {
-            var context = this.push(name, data);
-            this.getCompiled(context.path)(data);
-            return this.pop().html;
+            try {
+                var context = this.push(name, data);
+                this.getCompiled(context.path)(data);
+                return this.pop().html;
+            }
+            catch (err) {
+                this.clearStack();
+                throw err;
+            }
         },
         
         renderStr (str, data) {
