@@ -1,4 +1,4 @@
-module.exports = ejs = (function () {
+module.exports = EJS = (function () {
     
     const fs = require("fs");
     const path = require("path");

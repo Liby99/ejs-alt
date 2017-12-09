@@ -1,6 +1,6 @@
 {
   "name": "ejs-alt",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "An alternate implementation of EJS",
   "main": " ",
   "directories": {
@@ -21,6 +21,7 @@
   ],
   "author": "Liby99",
   "license": "ISC",
+  "main": "./src/ejs-alt.js",
   "bugs": {
     "url": "https://github.com/Liby99/ejs-alt/issues"
   },
