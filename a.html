@@ -3,4 +3,11 @@
     <p>678</p>
 <% }, num: num }); %>
 <p><%= str %></p>
+<ul>
+    <% [0, 1, 2, 3, 4, 5].forEach((num, i) => { %>
+        <li>
+            <%= num %>
+        </li>
+    <% }); %>
+</ul>
 <span id="<%= id %>">Hahahahaha</span>

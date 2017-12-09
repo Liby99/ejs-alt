@@ -16,18 +16,31 @@ EJS.render("/index.html", { title: "index" });
     fn = EJS.compile(file)
         funcstr = EJS.parse(file)
     
-    Stack: [], Templates: { "/index.html": fn }
+    Stack: [{ name: "/index.html", html: "" }], Templates: { "/index.html": fn }
     EJS.renderFunc(fn, { title: "index" })
         
         Stack: [{ name: "/index.html", html: "" }], Templates: { "/index.html": fn }
-        EJS.include("/view/navbar.html")
+        EJS.pushStack();
+        
+        Stack: [{ name: "/index.html", html: "" }, { name: "/index.html", html: "" }], Templates: { "/index.html": fn }
+        fn({ title: "index" });
             
             Stack: [{ name: "/index.html", html: "" }], Templates: { "/index.html": fn }
-            EJS.render("/view/navbar.html", {})
-                filename = EJS.resolve("/index.html") = "/index.html" join "/view/navbar.html";
-                file = EJS.readFile("/view/navbar.html");
-                fn2 = EJS.compile(file)
-                    funcstr = EJS.parse(file)
+            EJS.include("/view/navbar.html")
                 
-                Stack: [{ name: "/index.html", html: "" }]
-                Templates: { "/index.html": fn, "/view/navbar.html": fn2 }
+                Stack: [{ name: "/index.html", html: "" }], Templates: { "/index.html": fn }
+                EJS.render("/view/navbar.html", {})
+                    filename = EJS.resolve("/index.html") = "/index.html" join "/view/navbar.html";
+                    file = EJS.readFile("/view/navbar.html");
+                    fn2 = EJS.compile(file);
+                        funcstr = EJS.parse(file);
+                    
+                    Stack: [{ name: "/index.html", html: "" }]
+                    Templates: { "/index.html": fn, "/view/navbar.html": fn2 }
+                    EJS.renderFunc(fn2);
+                        
+                        Stack: [
+                            { name: "/index.html", html: "" },
+                            { name: "/view/navbar.html", html: ""}
+                        ]
+            
