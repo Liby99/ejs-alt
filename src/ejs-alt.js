@@ -8,13 +8,6 @@ module.exports = EJS = (function () {
         stack: [],
         template: {},
         
-        copy (obj) {
-            n = {};
-            for (var i in obj)
-                n[i] = obj[i];
-            return n;
-        },
-        
         peek () {
             return this.stack[this.stack.length - 1];
         },
@@ -30,8 +23,10 @@ module.exports = EJS = (function () {
         push (name, data) {
             if (name)
                 var obj = { path: this.resolve(name), data: data, html: "" };
-            else
-                var obj = this.copy(this.peek());
+            else {
+                var top = this.peek();
+                var obj = { path: top.path, data: top.data, html: "" };
+            }
             this.stack.push(obj);
             return obj;
         },
@@ -119,16 +114,16 @@ module.exports = EJS = (function () {
         },
         
         procIncData (d) {
-            var self = this, procIncData = this.procIncData.bind(this);
+            var self = this, proc = this.procIncData.bind(this);
             if (d instanceof Function)
                 return this.renderFunc(d);
             else if (d instanceof Array)
-                return d.map((o) => procIncData(o));
+                return d.map((o) => proc(o));
             else if (d instanceof Object)
                 return Object.keys(d).reduce((p, c) => {
-                    p[c] = procIncData(d[c]);
+                    p[c] = proc(d[c]);
                     return p;
-                }, {});
+                }, new Object(d));
             else
                 return d;
         },
