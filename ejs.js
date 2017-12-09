@@ -20,7 +20,7 @@ module.exports = ejs = (function () {
         },
         
         peekPath () {
-            return this.stack.length ? path.dirname(this.peek().path) : (__dirname + "/");
+            return this.stack.length ? path.dirname(this.peek().path) : ("/");
         },
         
         pop () {
@@ -134,7 +134,9 @@ module.exports = ejs = (function () {
                     
                     if (j < 0) throw new Error("Could not find matching close tag");
                     
-                    res += pre + str.substring(i, j).trim() + post;
+                    var js = str.substring(i, j);
+                    
+                    res += pre + js.trim() + post;
                     i += j - i + close.length - 1;
                 }
                 else {
@@ -154,8 +156,22 @@ module.exports = ejs = (function () {
     };
     
     return {
-        render: EJS.renderFile.bind(EJS)
+        render: EJS.renderFile.bind(EJS),
+        __express: function (path, options, callback) {
+            
+            if ('function' == typeof options) {
+                callback = options, options = {};
+            }
+            
+            try {
+                // console.log(options);
+                var result = EJS.renderFile(path, options);
+            }
+            catch (err) {
+                callback(err);
+                return;
+            }
+            callback(null, result);
+        }
     }
 })();
-
-console.log(ejs.render("a.html", { str: "str", id: "id", num: 3 }));
