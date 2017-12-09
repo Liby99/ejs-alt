@@ -55,16 +55,26 @@ module.exports = ejs = (function () {
         },
         
         compile (html) {
-            return new Function("data", "include", "append", "escape", this.genFuncBody(this.parse(html)));
+            return new Function("data", "append", "escape", "include", this.genFuncBody(this.parse(html)));
         },
         
         compileFile (fullpath) {
             var self = this, fn = this.compile(this.readFile(fullpath));
-            var include = this.include.bind(this),
-                append = this.append.bind(this),
+            var append = this.append.bind(this),
+                escape = this.escape.bind(this),
+                include = this.include.bind(this);
+            return (data) => {
+                fn(data, append, escape, include);
+            };
+        },
+        
+        compileStr (str) {
+            var self = this, fn = this.compile(str), __buf = [];
+            var append = __buf.push.bind(__buffer),
                 escape = this.escape.bind(this);
             return (data) => {
-                fn(data, include, append, escape);
+                fn(data, append, escape);
+                return __buf.join("");
             };
         },
         
@@ -85,6 +95,11 @@ module.exports = ejs = (function () {
             var context = this.push(name, data);
             this.getCompiled(context.path)(data);
             return this.pop().html;
+        },
+        
+        renderStr (str, data) {
+            var fn = this.compileString(str);
+            return fn(data);
         },
         
         procIncData (d) {
@@ -155,23 +170,30 @@ module.exports = ejs = (function () {
         }
     };
     
-    return {
-        render: EJS.renderFile.bind(EJS),
-        __express: function (path, options, callback) {
-            
-            if ('function' == typeof options) {
-                callback = options, options = {};
-            }
-            
-            try {
-                // console.log(options);
-                var result = EJS.renderFile(path, options);
-            }
-            catch (err) {
-                callback(err);
-                return;
-            }
-            callback(null, result);
+    function expressSupport (path, data, callback) {
+        
+        // First check parameters if the second one is callback function
+        if ('function' == typeof data) {
+            callback = options, data = {};
         }
+        
+        // Try render file
+        try {
+            var result = EJS.renderFile(path, data);
+        }
+        catch (err) {
+            callback(err);
+            return;
+        }
+        
+        // If there's no error, callback with result
+        callback(null, result);
+    }
+    
+    return {
+        compile: EJS.compileStr.bind(EJS),
+        render: EJS.renderStr.bind(EJS),
+        // renderFile: EJS.renderFile.bind(EJS), // Function not finished yet
+        __express: expressSupport
     }
 })();
