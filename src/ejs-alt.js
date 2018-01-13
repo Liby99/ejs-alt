@@ -69,7 +69,7 @@ module.exports = EJS = (function () {
         
         compileStr (str) {
             var self = this, fn = this.compile(str), __buf = [];
-            var append = __buf.push.bind(__buffer),
+            var append = __buf.push.bind(__buf),
                 escape = this.escape.bind(this);
             return (data) => {
                 fn(data, append, escape);
